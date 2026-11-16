@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+extracted_raw_docs.json
+.DS_Store
+Thumbs.db

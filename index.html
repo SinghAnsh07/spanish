@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudio de Español – Spanish Worksheet Practice & Testing</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Global Header -->
+    <header class="site-header">
+      <div class="brand-badge">
+        <span class="pulse-dot"></span>
+        <span>🌸 Spanish Studio · BESP101L</span>
+      </div>
+      <h1 class="site-title">Estudio de Español</h1>
+      <p class="site-subtitle">
+        Attempt worksheet questions digitally, test your skills, and get instant scores with clear grammar explanations.
+      </p>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: DOCUMENT HUB & SELECTION               -->
+    <!-- ============================================== -->
+    <main id="hub-view" class="hub-view">
+      <!-- Quick Stats Ribbon -->
+      <section class="stats-ribbon">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-docs-count">15</div>
+          <div class="stat-label">Worksheets</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-q-count">159</div>
+          <div class="stat-label">Total Questions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">A1 / BESP101L</div>
+          <div class="stat-label">Course Level</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Explanations</div>
+        </div>
+      </section>
+
+      <!-- Topic Filters -->
+      <nav class="filter-bar" id="filter-bar" aria-label="Worksheet topic filters">
+        <button class="filter-btn active" data-filter="all">All Documents</button>
+        <button class="filter-btn" data-filter="gustar">El Verbo Gustar</button>
+        <button class="filter-btn" data-filter="prepositions">Preposiciones & Lugar</button>
+        <button class="filter-btn" data-filter="calendar">Months, Time & Weather</button>
+        <button class="filter-btn" data-filter="reflexive">Verbos Reflexivos</button>
+        <button class="filter-btn" data-filter="stem">Stem-Changing & Tener</button>
+        <button class="filter-btn" data-filter="ser-estar">Ser vs Estar</button>
+        <button class="filter-btn" data-filter="contextual">Contextual Verbs</button>
+      </nav>
+
+      <!-- Worksheets Grid -->
+      <section class="docs-grid" id="docs-grid">
+        <!-- Rendered dynamically by app.js -->
+      </section>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: ACTIVE DIGITAL TEST                    -->
+    <!-- ============================================== -->
+    <section id="test-view" class="test-view">
+      <!-- Test Header Card -->
+      <div class="test-header-card">
+        <div class="test-nav-bar">
+          <button id="btn-back-hub" class="btn-secondary">
+            ← Back to Documents
+          </button>
+          <span class="doc-badge questions-count" id="test-badge-count">12 Questions</span>
+        </div>
+
+        <div class="test-title-area">
+          <h2 id="test-active-title">Worksheet Title</h2>
+          <p id="test-active-desc">Description of the current test module</p>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-track">
+          <div class="progress-fill" id="test-progress-fill"></div>
+        </div>
+
+        <!-- Spanish Accents Toolbar for convenience -->
+        <div class="accents-toolbar">
+          <span class="accents-label">Spanish characters:</span>
+          <button type="button" class="accent-pill" onclick="insertAccent('á')">á</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('é')">é</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('í')">í</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('ó')">ó</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('ú')">ú</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('ñ')">ñ</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('¿')">¿</button>
+          <button type="button" class="accent-pill" onclick="insertAccent('¡')">¡</button>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <form id="test-form" onsubmit="event.preventDefault(); submitActiveTest();">
+        <div class="questions-list" id="questions-container">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="test-bottom-bar">
+          <div class="test-summary-counter" id="test-answered-counter">
+            Answered: <strong>0</strong> of <strong>0</strong>
+          </div>
+          <button type="submit" class="btn-submit-test">
+            Submit Test & See Results →
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: RESULTS & EXPLANATIONS REVIEW          -->
+    <!-- ============================================== -->
+    <section id="results-view" class="results-view">
+      <!-- Results Hero Card -->
+      <div class="results-hero-card">
+        <div class="score-circle">
+          <span class="score-percent" id="res-score-percent">0%</span>
+          <span class="score-sub" id="res-score-fraction">0 / 0</span>
+        </div>
+        <h2 class="results-headline" id="res-headline">Test Complete!</h2>
+        <p class="results-comment" id="res-comment">Review your answers and detailed grammar explanations below.</p>
+
+        <div class="results-breakdown-row">
+          <div class="result-stat-chip correct" id="res-stat-correct">
+            ✓ 0 Correct
+          </div>
+          <div class="result-stat-chip incorrect" id="res-stat-incorrect">
+            ✕ 0 Incorrect
+          </div>
+          <div class="result-stat-chip" id="res-stat-total">
+            Total: 0 Questions
+          </div>
+        </div>
+
+        <div class="results-actions">
+          <button class="btn-aesthetic" style="width: auto;" onclick="retakeCurrentTest()">
+            ↺ Retake This Test
+          </button>
+          <button class="btn-secondary" onclick="returnToHub()">
+            📁 Choose Another Document
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter tabs for review -->
+      <div class="results-filter-bar">
+        <button class="filter-btn active" id="res-tab-all" onclick="filterReviewResults('all')">All Questions</button>
+        <button class="filter-btn" id="res-tab-incorrect" onclick="filterReviewResults('incorrect')">Incorrect Only</button>
+        <button class="filter-btn" id="res-tab-correct" onclick="filterReviewResults('correct')">Correct Only</button>
+      </div>
+
+      <!-- Detailed Question Reviews -->
+      <div class="review-list" id="review-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <p>Estudio de Español · Spanish I (BESP101L) Practice System</p>
+      <p style="margin-top: 0.25rem; font-size: 0.78rem;">Crafted with soft aesthetics for effortless practice & learning</p>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="tests_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
