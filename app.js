@@ -1,7 +1,9 @@
-// app.js - Spanish Studio Digital Testing Engine
+// app.js - Spanish Studio Digital Testing Engine & PYQ Simulator
 
 // Global State
+let currentSection = 'worksheets'; // 'worksheets' | 'pyq'
 let currentTest = null;
+let isPyqMode = false;
 let userAnswers = {};
 let lastEvaluatedResults = [];
 let activeTopicFilter = 'all';
@@ -15,10 +17,100 @@ let studiedDocs = new Set();
 document.addEventListener('DOMContentLoaded', () => {
   initStudiedDocs();
   renderHub();
+  renderPyq();
   setupFilterBar();
   setupBackButtons();
   updateStatsRibbon();
 });
+
+// Switch Main Section (Worksheets vs PYQ FAT Papers)
+function switchAppSection(section) {
+  currentSection = section;
+  const tabWs = document.getElementById('tab-worksheets');
+  const tabPyq = document.getElementById('tab-pyq');
+  const secWs = document.getElementById('section-worksheets');
+  const secPyq = document.getElementById('section-pyq');
+
+  if (section === 'worksheets') {
+    tabWs.classList.add('active');
+    tabPyq.classList.remove('active');
+    secWs.style.display = 'block';
+    secPyq.style.display = 'none';
+  } else {
+    tabPyq.classList.add('active');
+    tabWs.classList.remove('active');
+    secWs.style.display = 'none';
+    secPyq.style.display = 'block';
+    renderPyq();
+  }
+  window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+
+// Render Previous Year Papers (FAT)
+function renderPyq() {
+  const pyqGrid = document.getElementById('pyq-grid');
+  if (!pyqGrid || typeof PYQ_DATA === 'undefined') return;
+
+  pyqGrid.innerHTML = PYQ_DATA.map(paper => {
+    const sectionTags = (paper.sections || []).slice(0, 4).map(s => 
+      `<span class="format-tag">${escapeHtml(s)}</span>`
+    ).join('');
+
+    return `
+      <article class="doc-card" id="pyq-card-${paper.id}">
+        <div class="doc-card-top">
+          <div class="doc-card-header-row">
+            <div class="doc-meta-tags">
+              <span class="pyq-badge-slot">${escapeHtml(paper.exam_session)}</span>
+              <span class="doc-badge questions-count">${escapeHtml(paper.course_code)}</span>
+              <span class="pyq-badge-marks">${paper.total_marks} Marks</span>
+            </div>
+            <span class="doc-badge docx">${paper.questions.length} Questions</span>
+          </div>
+
+          <h3 class="doc-title">${escapeHtml(paper.title)}</h3>
+          ${paper.faculty ? `<div class="doc-student">👨‍🏫 ${escapeHtml(paper.faculty)} · ${escapeHtml(paper.slot || '')}</div>` : ''}
+          <p class="doc-desc">${escapeHtml(paper.description)}</p>
+          <div class="format-tags">
+            ${sectionTags}
+          </div>
+        </div>
+        <button class="btn-aesthetic" onclick="startPyqPaper('${paper.id}')">
+          Attempt Exam Paper (100 Marks) →
+        </button>
+      </article>
+    `;
+  }).join('');
+}
+
+// Start a PYQ Paper
+function startPyqPaper(paperId) {
+  const paper = (typeof PYQ_DATA !== 'undefined') ? PYQ_DATA.find(p => p.id === paperId) : null;
+  if (!paper) return;
+
+  currentTest = paper;
+  isPyqMode = true;
+  userAnswers = {};
+
+  // Switch View
+  document.getElementById('hub-view').style.display = 'none';
+  document.getElementById('results-view').style.display = 'none';
+  const testView = document.getElementById('test-view');
+  testView.style.display = 'block';
+
+  // Set Paper Details
+  document.getElementById('test-active-title').textContent = paper.title;
+  document.getElementById('test-active-desc').textContent = `${paper.exam_session} · ${paper.course_code} · Max Marks: ${paper.total_marks}`;
+  document.getElementById('test-badge-count').textContent = `${paper.questions.length} Questions · 100 Marks`;
+
+  // Hide or update studied toggle for PYQ
+  const testBtn = document.getElementById('test-btn-toggle-studied');
+  if (testBtn) testBtn.style.display = 'none';
+
+  renderQuestions(paper.questions);
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // Initialize Studied Set from localStorage or defaults
 function initStudiedDocs() {
@@ -28,7 +120,6 @@ function initStudiedDocs() {
       const arr = JSON.parse(saved);
       studiedDocs = new Set(arr);
     } else if (typeof TESTS_DATA !== 'undefined') {
-      // Default from database (files in done/ folder)
       TESTS_DATA.forEach(t => {
         if (t.default_studied || t.is_in_done_folder) {
           studiedDocs.add(t.id);
@@ -58,14 +149,12 @@ function updateStatsRibbon() {
   const toStudyCount = total - studiedCount;
   const pct = Math.round((studiedCount / total) * 100);
 
-  // Stats ribbon
   const statStudied = document.getElementById('stat-studied-count');
   if (statStudied) statStudied.textContent = `${studiedCount} / ${total}`;
 
   const progFill = document.getElementById('study-progress-fill');
   if (progFill) progFill.style.width = `${pct}%`;
 
-  // Filter badge counters
   const badgeAll = document.getElementById('badge-all');
   if (badgeAll) badgeAll.textContent = total;
 
@@ -81,7 +170,6 @@ function renderHub() {
   const docsGrid = document.getElementById('docs-grid');
   if (!docsGrid || typeof TESTS_DATA === 'undefined') return;
 
-  // Filter tests based on active topic / status
   const filteredTests = TESTS_DATA.filter(test => {
     if (activeTopicFilter === 'all') return true;
     if (activeTopicFilter === 'studied') return studiedDocs.has(test.id);
@@ -170,11 +258,9 @@ function toggleStudied(docId, event) {
   saveStudiedDocs();
   updateStatsRibbon();
 
-  // If in studied or to-study filter, re-render hub to reflect filter change
   if (activeTopicFilter === 'studied' || activeTopicFilter === 'to-study') {
     renderHub();
   } else {
-    // Smoothly update card in place
     const card = document.getElementById(`card-${docId}`);
     if (card) {
       const nowStudied = studiedDocs.has(docId);
@@ -189,24 +275,29 @@ function toggleStudied(docId, event) {
     }
   }
 
-  // Also sync with active test buttons if test is open
   syncActiveTestStudiedButton();
 }
 
 // Toggle Studied from inside Active Test or Results Screen
 function toggleActiveTestStudied() {
-  if (!currentTest) return;
+  if (!currentTest || isPyqMode) return;
   toggleStudied(currentTest.id);
   syncActiveTestStudiedButton();
 }
 
 function syncActiveTestStudiedButton() {
-  if (!currentTest) return;
-  const isStudied = studiedDocs.has(currentTest.id);
-
-  // Test view button
   const testBtn = document.getElementById('test-btn-toggle-studied');
+  const resBtn = document.getElementById('res-btn-toggle-studied');
+
+  if (!currentTest || isPyqMode) {
+    if (testBtn) testBtn.style.display = 'none';
+    if (resBtn) resBtn.style.display = 'none';
+    return;
+  }
+
+  const isStudied = studiedDocs.has(currentTest.id);
   if (testBtn) {
+    testBtn.style.display = 'inline-flex';
     testBtn.className = `btn-toggle-studied ${isStudied ? 'studied' : 'unstudied'}`;
     const icon = testBtn.querySelector('.icon');
     const label = testBtn.querySelector('.label');
@@ -214,9 +305,8 @@ function syncActiveTestStudiedButton() {
     if (label) label.textContent = isStudied ? 'Studied' : 'Mark as Studied';
   }
 
-  // Results view button
-  const resBtn = document.getElementById('res-btn-toggle-studied');
   if (resBtn) {
+    resBtn.style.display = 'inline-flex';
     if (isStudied) {
       resBtn.className = 'btn-secondary';
       resBtn.innerHTML = '✓ Studied (Click to unmark)';
@@ -275,12 +365,13 @@ function setupBackButtons() {
   }
 }
 
-// Start a Selected Test
+// Start a Selected Worksheet Test
 function startTest(testId) {
   const test = TESTS_DATA.find(t => t.id === testId);
   if (!test) return;
 
   currentTest = test;
+  isPyqMode = false;
   userAnswers = {};
 
   // Switch View
@@ -306,9 +397,10 @@ function renderQuestions(questions) {
   if (!container) return;
 
   container.innerHTML = questions.map((q, idx) => {
+    const marksBadge = q.marks ? `<span class="marks-chip">${q.marks} Mark${q.marks > 1 ? 's' : ''}</span>` : '';
     return `
       <div class="question-card" id="qcard-${q.id}">
-        <div class="question-section-badge">Question ${idx + 1} of ${questions.length} · ${escapeHtml(q.section || 'General')}</div>
+        <div class="question-section-badge">Question ${idx + 1} of ${questions.length} · ${escapeHtml(q.section || 'General')} ${marksBadge}</div>
         <div class="question-prompt">${escapeHtml(q.prompt)}</div>
         <div class="question-body">
           ${renderQuestionInput(q, idx)}
@@ -317,7 +409,6 @@ function renderQuestions(questions) {
     `;
   }).join('');
 
-  // Attach input focus listeners for Spanish accents bar
   container.querySelectorAll('input.fill-input-box').forEach(input => {
     input.addEventListener('focus', () => {
       activeFocusedInput = input;
@@ -345,7 +436,6 @@ function renderQuestionInput(q, idx) {
       </div>
     `;
   } else {
-    // Fill in the blank
     return `
       <div class="fill-input-wrapper">
         <input type="text" 
@@ -402,7 +492,6 @@ function updateProgress() {
 // Spanish Accents Toolbar Helper
 function insertAccent(char) {
   if (!activeFocusedInput) {
-    // Pick the first available fill-in input if none currently focused
     activeFocusedInput = document.querySelector('input.fill-input-box');
   }
   if (!activeFocusedInput) return;
@@ -416,7 +505,6 @@ function insertAccent(char) {
   input.focus();
   input.selectionStart = input.selectionEnd = start + char.length;
 
-  // Trigger input update
   const qId = input.dataset.qid;
   if (qId) {
     userAnswers[qId] = input.value;
@@ -434,20 +522,24 @@ function normalizeAnswer(str) {
     .replace(/\s+/g, ' ');
 }
 
-// Accent-insensitive normalization
 function stripDiacritics(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// Evaluate Test
+// Evaluate Test & Calculate Marks
 function submitActiveTest() {
   if (!currentTest) return;
 
-  const total = currentTest.questions.length;
+  const totalQuestions = currentTest.questions.length;
   const results = [];
   let correctCount = 0;
+  let marksEarned = 0;
+  let totalPossibleMarks = 0;
 
   currentTest.questions.forEach(q => {
+    const qMarks = q.marks || 1;
+    totalPossibleMarks += qMarks;
+
     const userRaw = userAnswers[q.id] || '';
     const userNorm = normalizeAnswer(userRaw);
     const correctNorm = normalizeAnswer(q.answer);
@@ -457,60 +549,80 @@ function submitActiveTest() {
     if (q.type === 'mcq' || q.type === 'tf' || q.type === 'match') {
       isCorrect = (userNorm === correctNorm);
     } else {
-      // Fill-in check
       const accepted = (q.acceptable_answers || [q.answer]).map(a => normalizeAnswer(a));
-      
-      // Exact normalized match or accent-stripped match
       isCorrect = accepted.includes(userNorm) || 
                   accepted.some(acc => stripDiacritics(acc) === stripDiacritics(userNorm) && userNorm.length > 0);
     }
 
-    if (isCorrect) correctCount++;
+    if (isCorrect) {
+      correctCount++;
+      marksEarned += qMarks;
+    }
 
     results.push({
       question: q,
       userAnswer: userRaw.trim() || '(No answer provided)',
       isCorrect: isCorrect,
       correctAnswer: q.answer,
-      explanation: q.explanation
+      explanation: q.explanation,
+      marks: qMarks,
+      earned: isCorrect ? qMarks : 0
     });
   });
 
   lastEvaluatedResults = results;
-  displayResults(correctCount, total, results);
+  displayResults(correctCount, totalQuestions, marksEarned, totalPossibleMarks, results);
 }
 
 // Display Test Results View
-function displayResults(correct, total, results) {
+function displayResults(correct, total, marksEarned, totalPossibleMarks, results) {
   document.getElementById('test-view').style.display = 'none';
   const resView = document.getElementById('results-view');
   resView.style.display = 'block';
 
-  const pct = Math.round((correct / total) * 100);
+  const pct = Math.round((marksEarned / totalPossibleMarks) * 100);
   const incorrect = total - correct;
 
-  document.getElementById('res-score-percent').textContent = `${pct}%`;
-  document.getElementById('res-score-fraction').textContent = `${correct} / ${total}`;
-  document.getElementById('res-stat-correct').textContent = `✓ ${correct} Correct`;
-  document.getElementById('res-stat-incorrect').textContent = `✕ ${incorrect} Incorrect`;
-  document.getElementById('res-stat-total').textContent = `Total: ${total} Questions`;
+  // Grade determination for PYQ papers
+  let gradeText = '';
+  if (isPyqMode) {
+    if (pct >= 90) gradeText = 'S Grade (Outstanding)';
+    else if (pct >= 80) gradeText = 'A Grade (Excellent)';
+    else if (pct >= 70) gradeText = 'B Grade (Very Good)';
+    else if (pct >= 60) gradeText = 'C Grade (Good)';
+    else if (pct >= 50) gradeText = 'D Grade (Pass)';
+    else gradeText = 'F Grade (Needs Revision)';
+  }
 
-  // Headline
+  document.getElementById('res-score-percent').textContent = `${pct}%`;
+  document.getElementById('res-score-fraction').textContent = isPyqMode 
+    ? `${marksEarned} / ${totalPossibleMarks} Marks` 
+    : `${correct} / ${total}`;
+
+  document.getElementById('res-stat-correct').textContent = `✓ ${correct} Correct (${marksEarned} Marks)`;
+  document.getElementById('res-stat-incorrect').textContent = `✕ ${incorrect} Incorrect`;
+  document.getElementById('res-stat-total').textContent = isPyqMode ? `Predicted Grade: ${gradeText}` : `Total: ${total} Questions`;
+
   const headline = document.getElementById('res-headline');
   const comment = document.getElementById('res-comment');
 
-  if (pct === 100) {
-    headline.textContent = '¡Perfecto! Outstanding Score 🌟';
-    comment.textContent = 'You answered every question with 100% accuracy. Excellent Spanish mastery!';
-  } else if (pct >= 80) {
-    headline.textContent = '¡Muy Bien! Great Job 👏';
-    comment.textContent = 'Impressive performance! Check out the explanations below for the few you missed.';
-  } else if (pct >= 60) {
-    headline.textContent = '¡Buen Esfuerzo! Good Practice 👍';
-    comment.textContent = 'Good foundation. Read through the grammar notes and explanations below to improve.';
+  if (isPyqMode) {
+    headline.textContent = `FAT Exam Result: ${gradeText}`;
+    comment.textContent = `You scored ${marksEarned} marks out of ${totalPossibleMarks} marks (${pct}%). Review the official answer key and explanations below.`;
   } else {
-    headline.textContent = '¡Sigue Practicando! Keep Learning 💪';
-    comment.textContent = 'Review the detailed grammar explanations below and try retaking the test!';
+    if (pct === 100) {
+      headline.textContent = '¡Perfecto! Outstanding Score 🌟';
+      comment.textContent = 'You answered every question with 100% accuracy. Excellent Spanish mastery!';
+    } else if (pct >= 80) {
+      headline.textContent = '¡Muy Bien! Great Job 👏';
+      comment.textContent = 'Impressive performance! Check out the explanations below for the few you missed.';
+    } else if (pct >= 60) {
+      headline.textContent = '¡Buen Esfuerzo! Good Practice 👍';
+      comment.textContent = 'Good foundation. Read through the grammar notes and explanations below to improve.';
+    } else {
+      headline.textContent = '¡Sigue Practicando! Keep Learning 💪';
+      comment.textContent = 'Review the detailed grammar explanations below and try retaking the test!';
+    }
   }
 
   syncActiveTestStudiedButton();
@@ -520,7 +632,7 @@ function displayResults(correct, total, results) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Filter Review Questions (All, Incorrect, Correct)
+// Filter Review Questions
 function filterReviewResults(filterType) {
   currentReviewFilter = filterType;
   updateReviewFilterButtons();
@@ -556,7 +668,7 @@ function renderReviewList() {
     const q = item.question;
     const isCorrect = item.isCorrect;
     const cardClass = isCorrect ? 'correct' : 'incorrect';
-    const tagText = isCorrect ? '✓ Correcto' : '✕ Incorrecto';
+    const tagText = isCorrect ? `✓ Correcto (+${item.earned} Mark)` : `✕ Incorrecto (0 / ${item.marks} Mark)`;
     const tagClass = isCorrect ? 'correct' : 'incorrect';
 
     return `
@@ -590,7 +702,11 @@ function renderReviewList() {
 // Retake Current Test
 function retakeCurrentTest() {
   if (currentTest) {
-    startTest(currentTest.id);
+    if (isPyqMode) {
+      startPyqPaper(currentTest.id);
+    } else {
+      startTest(currentTest.id);
+    }
   }
 }
 
@@ -601,8 +717,12 @@ function returnToHub() {
   document.getElementById('test-view').style.display = 'none';
   document.getElementById('results-view').style.display = 'none';
   document.getElementById('hub-view').style.display = 'block';
-  updateStatsRibbon();
-  renderHub();
+  
+  if (currentSection === 'pyq') {
+    switchAppSection('pyq');
+  } else {
+    switchAppSection('worksheets');
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

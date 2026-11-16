@@ -24,59 +24,110 @@
       </div>
       <h1 class="site-title">Estudio de Español</h1>
       <p class="site-subtitle">
-        Attempt worksheet questions digitally, test your skills, and get instant scores with clear grammar explanations.
+        Attempt worksheet questions and previous year exam papers digitally with real marks and clear explanations.
       </p>
+
+      <!-- Main Section Navigation Tabs -->
+      <div class="nav-switch-container">
+        <div class="nav-switch-tabs" role="tablist">
+          <button type="button" class="nav-tab-btn active" id="tab-worksheets" onclick="switchAppSection('worksheets')">
+            📁 Course Worksheets (15)
+          </button>
+          <button type="button" class="nav-tab-btn" id="tab-pyq" onclick="switchAppSection('pyq')">
+            🎓 Practice Previous Year Papers (FAT)
+          </button>
+        </div>
+      </div>
     </header>
 
     <!-- ============================================== -->
     <!-- VIEW 1: DOCUMENT HUB & SELECTION               -->
     <!-- ============================================== -->
     <main id="hub-view" class="hub-view">
-      <!-- Quick Stats Ribbon -->
-      <section class="stats-ribbon">
-        <div class="stat-item">
-          <div class="stat-num" id="stat-docs-count">15</div>
-          <div class="stat-label">Worksheets</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num" id="stat-studied-count">2 / 15</div>
-          <div class="stat-label">Studied</div>
-          <div class="mini-study-progress">
-            <div class="mini-study-fill" id="study-progress-fill" style="width: 13%;"></div>
+      
+      <!-- SUBSECTION A: WORKSHEETS -->
+      <div id="section-worksheets">
+        <!-- Quick Stats Ribbon -->
+        <section class="stats-ribbon">
+          <div class="stat-item">
+            <div class="stat-num" id="stat-docs-count">15</div>
+            <div class="stat-label">Worksheets</div>
           </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num" id="stat-q-count">159</div>
-          <div class="stat-label">Total Questions</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">A1 / BESP101L</div>
-          <div class="stat-label">Course Level</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">100%</div>
-          <div class="stat-label">Explanations</div>
-        </div>
-      </section>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-studied-count">2 / 15</div>
+            <div class="stat-label">Studied</div>
+            <div class="mini-study-progress">
+              <div class="mini-study-fill" id="study-progress-fill" style="width: 13%;"></div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-q-count">159</div>
+            <div class="stat-label">Total Questions</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">A1 / BESP101L</div>
+            <div class="stat-label">Course Level</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Explanations</div>
+          </div>
+        </section>
 
-      <!-- Topic & Status Filters -->
-      <nav class="filter-bar" id="filter-bar" aria-label="Worksheet topic and status filters">
-        <button class="filter-btn active" data-filter="all">All Documents <span class="filter-badge-counter" id="badge-all">15</span></button>
-        <button class="filter-btn" data-filter="studied">✅ Studied <span class="filter-badge-counter" id="badge-studied">2</span></button>
-        <button class="filter-btn" data-filter="to-study">⏳ To Study <span class="filter-badge-counter" id="badge-to-study">13</span></button>
-        <button class="filter-btn" data-filter="gustar">El Verbo Gustar</button>
-        <button class="filter-btn" data-filter="prepositions">Preposiciones & Lugar</button>
-        <button class="filter-btn" data-filter="calendar">Months, Time & Weather</button>
-        <button class="filter-btn" data-filter="reflexive">Verbos Reflexivos</button>
-        <button class="filter-btn" data-filter="stem">Stem-Changing & Tener</button>
-        <button class="filter-btn" data-filter="ser-estar">Ser vs Estar</button>
-        <button class="filter-btn" data-filter="contextual">Contextual Verbs</button>
-      </nav>
+        <!-- Topic & Status Filters -->
+        <nav class="filter-bar" id="filter-bar" aria-label="Worksheet topic and status filters">
+          <button class="filter-btn active" data-filter="all">All Documents <span class="filter-badge-counter" id="badge-all">15</span></button>
+          <button class="filter-btn" data-filter="studied">✅ Studied <span class="filter-badge-counter" id="badge-studied">2</span></button>
+          <button class="filter-btn" data-filter="to-study">⏳ To Study <span class="filter-badge-counter" id="badge-to-study">13</span></button>
+          <button class="filter-btn" data-filter="gustar">El Verbo Gustar</button>
+          <button class="filter-btn" data-filter="prepositions">Preposiciones & Lugar</button>
+          <button class="filter-btn" data-filter="calendar">Months, Time & Weather</button>
+          <button class="filter-btn" data-filter="reflexive">Verbos Reflexivos</button>
+          <button class="filter-btn" data-filter="stem">Stem-Changing & Tener</button>
+          <button class="filter-btn" data-filter="ser-estar">Ser vs Estar</button>
+          <button class="filter-btn" data-filter="contextual">Contextual Verbs</button>
+        </nav>
 
-      <!-- Worksheets Grid -->
-      <section class="docs-grid" id="docs-grid">
-        <!-- Rendered dynamically by app.js -->
-      </section>
+        <!-- Worksheets Grid -->
+        <section class="docs-grid" id="docs-grid">
+          <!-- Rendered dynamically by app.js -->
+        </section>
+      </div>
+
+      <!-- SUBSECTION B: PREVIOUS YEAR PAPERS (FAT) -->
+      <div id="section-pyq" style="display: none;">
+        <div class="pyq-hero-banner">
+          <h2 class="pyq-hero-title">🎓 VIT University FAT Previous Year Papers</h2>
+          <p class="pyq-hero-desc">
+            Browse and practice official Final Assessment Test (FAT) papers paper-wise. Attempt questions digitally with actual marks breakdown and complete grammatical explanations.
+          </p>
+        </div>
+
+        <section class="stats-ribbon">
+          <div class="stat-item">
+            <div class="stat-num">5</div>
+            <div class="stat-label">Official Papers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">97</div>
+            <div class="stat-label">FAT Questions</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">100 Marks</div>
+            <div class="stat-label">Per Exam Paper</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Explanations</div>
+          </div>
+        </section>
+
+        <!-- PYQ Papers Grid -->
+        <section class="docs-grid" id="pyq-grid">
+          <!-- Rendered dynamically by app.js -->
+        </section>
+      </div>
+
     </main>
 
     <!-- ============================================== -->
@@ -200,6 +251,7 @@
 
   <!-- Scripts -->
   <script src="tests_data.js"></script>
+  <script src="pyq_data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -1378,9 +1378,9 @@ window.TESTS_DATA = [
         "explanation": "Infinitives take 'gusta'."
       }
     ],
-    "folder": ".",
-    "is_in_done_folder": false,
-    "default_studied": false
+    "folder": "done",
+    "is_in_done_folder": true,
+    "default_studied": true
   },
   {
     "id": "medarametla-sudeep-23bce1819",

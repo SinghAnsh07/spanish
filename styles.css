@@ -942,3 +942,108 @@ body {
   from { opacity: 1; }
   to { opacity: 0; transform: translateY(-10px); }
 }
+
+/* ================================================= */
+/* NAVIGATION SWITCHER (WORKSHEETS vs PYQ PAPERS)    */
+/* ================================================= */
+.nav-switch-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.nav-switch-tabs {
+  display: inline-flex;
+  background: #ffffff;
+  padding: 0.3rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid #fbcfe8;
+  box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);
+  gap: 0.35rem;
+}
+
+.nav-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 0.55rem 1.4rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.22s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-tab-btn:hover {
+  color: #be185d;
+  background: #fff5f8;
+}
+
+.nav-tab-btn.active {
+  background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(244, 114, 182, 0.3);
+}
+
+/* PYQ Section Styling */
+.pyq-hero-banner {
+  background: linear-gradient(180deg, #ffffff 0%, #fff7f9 100%);
+  border: 1.5px solid #fce7f3;
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.pyq-hero-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #372b34;
+  margin-bottom: 0.35rem;
+}
+
+.pyq-hero-desc {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.pyq-badge-slot {
+  background: #fdf2f8;
+  color: #be185d;
+  border: 1px solid #fbcfe8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+.pyq-badge-marks {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+.marks-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ecfdf5;
+  color: #047857;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid #a7f3d0;
+  margin-left: 0.5rem;
+}

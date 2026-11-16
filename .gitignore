@@ -1,5 +1,8 @@
 __pycache__/
 *.pyc
 extracted_raw_docs.json
+fat_pages/
+fat_headers/
+test_ocr.ps1
 .DS_Store
 Thumbs.db

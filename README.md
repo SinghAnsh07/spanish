@@ -16,6 +16,10 @@ An aesthetic, responsive digital worksheet and testing platform for **Spanish I 
   - Persists your progress seamlessly in browser `localStorage`.
   - Filter hub by `All Documents`, `✅ Studied`, or `⏳ To Study` with live counters and study progress percentage bar.
   - Mark or unmark a document right from the active test or post-test results review screen.
+- **🎓 Practice Previous Year Papers (FAT)**:
+  - Practice real university **Final Assessment Test (FAT)** papers paper-wise from `Spanish FAT.pdf`.
+  - Official 100-mark evaluation with predicted university grades (**S Grade**, **A Grade**, **B Grade**, etc.).
+  - Real exam sections: Articles, Regular & Irregular Conjugations, Gustar/Interesar error corrections, Estar + Gerundio, Ser vs Estar vs Tener, Directions, and Reading Comprehensions.
 - **📁 Document Selection Hub**: Filter and choose among all **15 course documents & worksheets** or browse by grammar topic.
 - **✍️ Digital Testing Mode**:
   - Multiple Choice Questions (MCQ) with intuitive radio pills.
