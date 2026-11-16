@@ -325,7 +325,10 @@ window.TESTS_DATA = [
         ],
         "explanation": "'Wednesday' in Spanish is 'miércoles'. Days of the week are not capitalized in standard Spanish sentences."
       }
-    ]
+    ],
+    "folder": "done",
+    "is_in_done_folder": true,
+    "default_studied": true
   },
   {
     "id": "gustar-song-23bce1613",
@@ -540,7 +543,10 @@ window.TESTS_DATA = [
         "answer": "I like you",
         "explanation": "'Me gustas tú' literally means 'You are pleasing to me', which translates naturally as 'I like you'."
       }
-    ]
+    ],
+    "folder": "done",
+    "is_in_done_folder": true,
+    "default_studied": true
   },
   {
     "id": "gustar-complete-23bce1816",
@@ -706,7 +712,10 @@ window.TESTS_DATA = [
         "answer": "The wind",
         "explanation": "'El viento' means 'the wind'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "prepositions-viraj-23bce1898",
@@ -891,7 +900,10 @@ window.TESTS_DATA = [
         ],
         "explanation": "'Near my house' is 'cerca de mi casa'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "module4-rawat-24blc1207",
@@ -1066,7 +1078,10 @@ window.TESTS_DATA = [
         "answer": "muchos",
         "explanation": "'Parques' is masculine plural, so we use 'muchos'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "preposiciones-23bee1018",
@@ -1191,7 +1206,10 @@ window.TESTS_DATA = [
         "answer": "mucho",
         "explanation": "With the verb gustar, 'mucho' expresses 'a lot' ('I like this song a lot'). We never say 'me gusta muy'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "seasons-months-23bce1603",
@@ -1359,7 +1377,10 @@ window.TESTS_DATA = [
         "answer": "gusta",
         "explanation": "Infinitives take 'gusta'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "medarametla-sudeep-23bce1819",
@@ -1476,7 +1497,10 @@ window.TESTS_DATA = [
         "answer": "Falso",
         "explanation": "False. 'La lluvia' means the rain, while 'el viento' means the wind."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "ser-vs-estar-javier",
@@ -1606,7 +1630,10 @@ window.TESTS_DATA = [
         "answer": "'Es caliente' refers to its general nature; 'está caliente' means it is hot right now.",
         "explanation": "SER describes intrinsic characteristics, while ESTAR describes current temperature or condition."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "reflexive-verbs-rigoberta",
@@ -1750,7 +1777,10 @@ window.TESTS_DATA = [
         "answer": "se ducha y se lava",
         "explanation": "Both actions are conjugated for she: 'se ducha y se lava'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "stem-changing-tener",
@@ -1878,7 +1908,10 @@ window.TESTS_DATA = [
         "answer": "razón",
         "explanation": "'Tener razón' means to be right / correct."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "calendar-festivals-seasons",
@@ -1984,7 +2017,10 @@ window.TESTS_DATA = [
         "answer": "December",
         "explanation": "Christmas falls in December."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "contextual-verbs-23bce1841",
@@ -2096,7 +2132,10 @@ window.TESTS_DATA = [
         "answer": "dirigir",
         "explanation": "Running an enterprise means to lead/manage it: 'dirigir un negocio'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "stem-changing-practice",
@@ -2209,7 +2248,10 @@ window.TESTS_DATA = [
         "answer": "tienes sueño",
         "explanation": "At 11 PM, you are sleepy: 'tienes sueño'."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   },
   {
     "id": "syllabus-guide",
@@ -2278,7 +2320,10 @@ window.TESTS_DATA = [
         "answer": "Verdadero",
         "explanation": "True. The syllabus officially states: Mode of Evaluation: CAT, Digital Assignment, Quiz, FAT."
       }
-    ]
+    ],
+    "folder": ".",
+    "is_in_done_folder": false,
+    "default_studied": false
   }
 ];
 var TESTS_DATA = window.TESTS_DATA;

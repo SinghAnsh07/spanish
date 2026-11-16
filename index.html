@@ -39,6 +39,13 @@
           <div class="stat-label">Worksheets</div>
         </div>
         <div class="stat-item">
+          <div class="stat-num" id="stat-studied-count">2 / 15</div>
+          <div class="stat-label">Studied</div>
+          <div class="mini-study-progress">
+            <div class="mini-study-fill" id="study-progress-fill" style="width: 13%;"></div>
+          </div>
+        </div>
+        <div class="stat-item">
           <div class="stat-num" id="stat-q-count">159</div>
           <div class="stat-label">Total Questions</div>
         </div>
@@ -52,9 +59,11 @@
         </div>
       </section>
 
-      <!-- Topic Filters -->
-      <nav class="filter-bar" id="filter-bar" aria-label="Worksheet topic filters">
-        <button class="filter-btn active" data-filter="all">All Documents</button>
+      <!-- Topic & Status Filters -->
+      <nav class="filter-bar" id="filter-bar" aria-label="Worksheet topic and status filters">
+        <button class="filter-btn active" data-filter="all">All Documents <span class="filter-badge-counter" id="badge-all">15</span></button>
+        <button class="filter-btn" data-filter="studied">✅ Studied <span class="filter-badge-counter" id="badge-studied">2</span></button>
+        <button class="filter-btn" data-filter="to-study">⏳ To Study <span class="filter-badge-counter" id="badge-to-study">13</span></button>
         <button class="filter-btn" data-filter="gustar">El Verbo Gustar</button>
         <button class="filter-btn" data-filter="prepositions">Preposiciones & Lugar</button>
         <button class="filter-btn" data-filter="calendar">Months, Time & Weather</button>
@@ -80,7 +89,12 @@
           <button id="btn-back-hub" class="btn-secondary">
             ← Back to Documents
           </button>
-          <span class="doc-badge questions-count" id="test-badge-count">12 Questions</span>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="button" class="btn-toggle-studied unstudied" id="test-btn-toggle-studied" onclick="toggleActiveTestStudied()">
+              <span class="icon">○</span> <span class="label">Mark as Studied</span>
+            </button>
+            <span class="doc-badge questions-count" id="test-badge-count">12 Questions</span>
+          </div>
         </div>
 
         <div class="test-title-area">
@@ -153,6 +167,9 @@
         <div class="results-actions">
           <button class="btn-aesthetic" style="width: auto;" onclick="retakeCurrentTest()">
             ↺ Retake This Test
+          </button>
+          <button class="btn-secondary" id="res-btn-toggle-studied" onclick="toggleActiveTestStudied()">
+            ✓ Mark as Studied
           </button>
           <button class="btn-secondary" onclick="returnToHub()">
             📁 Choose Another Document

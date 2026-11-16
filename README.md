@@ -10,6 +10,12 @@ An aesthetic, responsive digital worksheet and testing platform for **Spanish I 
 
 - **🌸 Soft Pastel Aesthetic**: Designed with gentle baby pink (`#f472b6`, `#fdf2f8`), soft rose accents, and pure marshmallow white surfaces.
 - **✨ Clean & Non-Bloated**: Sleek pill-shaped buttons, minimal borders, subtle focus states, and zero clutter.
+- **✅ Studied Status Tracking**:
+  - Mark any worksheet as **Studied** (`✓ Studied`) or **To Study** (`○ Mark as Studied`) with a single click.
+  - Recognizes documents moved into the `done/` folder automatically.
+  - Persists your progress seamlessly in browser `localStorage`.
+  - Filter hub by `All Documents`, `✅ Studied`, or `⏳ To Study` with live counters and study progress percentage bar.
+  - Mark or unmark a document right from the active test or post-test results review screen.
 - **📁 Document Selection Hub**: Filter and choose among all **15 course documents & worksheets** or browse by grammar topic.
 - **✍️ Digital Testing Mode**:
   - Multiple Choice Questions (MCQ) with intuitive radio pills.

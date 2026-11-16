@@ -8,23 +8,86 @@ let activeTopicFilter = 'all';
 let currentReviewFilter = 'all';
 let activeFocusedInput = null;
 
+// Persistent Studied Set
+let studiedDocs = new Set();
+
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
+  initStudiedDocs();
   renderHub();
   setupFilterBar();
   setupBackButtons();
+  updateStatsRibbon();
 });
+
+// Initialize Studied Set from localStorage or defaults
+function initStudiedDocs() {
+  try {
+    const saved = localStorage.getItem('spanish_studied_docs');
+    if (saved !== null) {
+      const arr = JSON.parse(saved);
+      studiedDocs = new Set(arr);
+    } else if (typeof TESTS_DATA !== 'undefined') {
+      // Default from database (files in done/ folder)
+      TESTS_DATA.forEach(t => {
+        if (t.default_studied || t.is_in_done_folder) {
+          studiedDocs.add(t.id);
+        }
+      });
+      saveStudiedDocs();
+    }
+  } catch (e) {
+    console.error('Error loading studied docs from localStorage:', e);
+  }
+}
+
+function saveStudiedDocs() {
+  try {
+    localStorage.setItem('spanish_studied_docs', JSON.stringify(Array.from(studiedDocs)));
+  } catch (e) {
+    console.error('Error saving studied docs to localStorage:', e);
+  }
+}
+
+// Update Header Stats Ribbon & Filter Badges
+function updateStatsRibbon() {
+  if (typeof TESTS_DATA === 'undefined') return;
+
+  const total = TESTS_DATA.length;
+  const studiedCount = Array.from(studiedDocs).filter(id => TESTS_DATA.some(t => t.id === id)).length;
+  const toStudyCount = total - studiedCount;
+  const pct = Math.round((studiedCount / total) * 100);
+
+  // Stats ribbon
+  const statStudied = document.getElementById('stat-studied-count');
+  if (statStudied) statStudied.textContent = `${studiedCount} / ${total}`;
+
+  const progFill = document.getElementById('study-progress-fill');
+  if (progFill) progFill.style.width = `${pct}%`;
+
+  // Filter badge counters
+  const badgeAll = document.getElementById('badge-all');
+  if (badgeAll) badgeAll.textContent = total;
+
+  const badgeStudied = document.getElementById('badge-studied');
+  if (badgeStudied) badgeStudied.textContent = studiedCount;
+
+  const badgeToStudy = document.getElementById('badge-to-study');
+  if (badgeToStudy) badgeToStudy.textContent = toStudyCount;
+}
 
 // Setup Hub Documents
 function renderHub() {
   const docsGrid = document.getElementById('docs-grid');
   if (!docsGrid || typeof TESTS_DATA === 'undefined') return;
 
-  // Filter tests based on active topic
+  // Filter tests based on active topic / status
   const filteredTests = TESTS_DATA.filter(test => {
     if (activeTopicFilter === 'all') return true;
+    if (activeTopicFilter === 'studied') return studiedDocs.has(test.id);
+    if (activeTopicFilter === 'to-study') return !studiedDocs.has(test.id);
+
     const topicLower = (test.topic + ' ' + test.title + ' ' + test.id).toLowerCase();
-    
     if (activeTopicFilter === 'gustar') return topicLower.includes('gustar');
     if (activeTopicFilter === 'prepositions') return topicLower.includes('preposicion') || topicLower.includes('lugar') || topicLower.includes('preposition');
     if (activeTopicFilter === 'calendar') return topicLower.includes('month') || topicLower.includes('mes') || topicLower.includes('weather') || topicLower.includes('clima') || topicLower.includes('season') || topicLower.includes('time') || topicLower.includes('hora');
@@ -35,22 +98,44 @@ function renderHub() {
     return true;
   });
 
+  if (filteredTests.length === 0) {
+    docsGrid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border: 1px dashed #fbcfe8; border-radius: 16px; color: #6b7280;">
+        <p style="font-size: 1.1rem; font-weight: 600; color: #be185d; margin-bottom: 0.35rem;">No worksheets found for this filter</p>
+        <p style="font-size: 0.9rem;">Try selecting "All Documents" or a different topic category.</p>
+      </div>
+    `;
+    return;
+  }
+
   docsGrid.innerHTML = filteredTests.map(test => {
     const isPdf = test.filename.toLowerCase().endsWith('.pdf');
     const badgeClass = isPdf ? 'pdf' : 'docx';
     const badgeText = isPdf ? 'PDF DOC' : 'WORD DOCX';
+    const isStudied = studiedDocs.has(test.id);
     
     const formatBadges = (test.format_breakdown || []).slice(0, 3).map(fmt => 
       `<span class="format-tag">${escapeHtml(fmt)}</span>`
     ).join('');
 
     return `
-      <article class="doc-card" id="card-${test.id}">
+      <article class="doc-card ${isStudied ? 'is-studied' : ''}" id="card-${test.id}">
         <div class="doc-card-top">
-          <div class="doc-meta-tags">
-            <span class="doc-badge ${badgeClass}">${badgeText}</span>
-            <span class="doc-badge questions-count">${test.questions.length} Questions</span>
+          <div class="doc-card-header-row">
+            <div class="doc-meta-tags">
+              <span class="doc-badge ${badgeClass}">${badgeText}</span>
+              ${test.is_in_done_folder ? '<span class="doc-badge done-folder" title="File located in done/ folder">📁 in done/</span>' : ''}
+              <span class="doc-badge questions-count">${test.questions.length} Qs</span>
+            </div>
+            <button type="button" 
+                    class="btn-toggle-studied ${isStudied ? 'studied' : 'unstudied'}" 
+                    onclick="toggleStudied('${test.id}', event)" 
+                    title="${isStudied ? 'Click to mark as unstudied' : 'Click to mark as studied'}">
+              <span class="icon">${isStudied ? '✓' : '○'}</span>
+              <span class="label">${isStudied ? 'Studied' : 'Mark as Studied'}</span>
+            </button>
           </div>
+
           <h3 class="doc-title">${escapeHtml(test.title)}</h3>
           ${test.student ? `<div class="doc-student">${escapeHtml(test.student)}</div>` : ''}
           <p class="doc-desc">${escapeHtml(test.description)}</p>
@@ -66,16 +151,118 @@ function renderHub() {
   }).join('');
 }
 
+// Toggle Studied Status from Card
+function toggleStudied(docId, event) {
+  if (event) event.stopPropagation();
+
+  const isCurrentlyStudied = studiedDocs.has(docId);
+  const test = TESTS_DATA.find(t => t.id === docId);
+  const docTitle = test ? test.title : 'Document';
+
+  if (isCurrentlyStudied) {
+    studiedDocs.delete(docId);
+    showToast(`Marked "${docTitle}" as To Study`, false);
+  } else {
+    studiedDocs.add(docId);
+    showToast(`🌸 Marked "${docTitle}" as Studied!`, true);
+  }
+
+  saveStudiedDocs();
+  updateStatsRibbon();
+
+  // If in studied or to-study filter, re-render hub to reflect filter change
+  if (activeTopicFilter === 'studied' || activeTopicFilter === 'to-study') {
+    renderHub();
+  } else {
+    // Smoothly update card in place
+    const card = document.getElementById(`card-${docId}`);
+    if (card) {
+      const nowStudied = studiedDocs.has(docId);
+      card.classList.toggle('is-studied', nowStudied);
+      const btn = card.querySelector('.btn-toggle-studied');
+      if (btn) {
+        btn.className = `btn-toggle-studied ${nowStudied ? 'studied' : 'unstudied'}`;
+        btn.title = nowStudied ? 'Click to mark as unstudied' : 'Click to mark as studied';
+        btn.querySelector('.icon').textContent = nowStudied ? '✓' : '○';
+        btn.querySelector('.label').textContent = nowStudied ? 'Studied' : 'Mark as Studied';
+      }
+    }
+  }
+
+  // Also sync with active test buttons if test is open
+  syncActiveTestStudiedButton();
+}
+
+// Toggle Studied from inside Active Test or Results Screen
+function toggleActiveTestStudied() {
+  if (!currentTest) return;
+  toggleStudied(currentTest.id);
+  syncActiveTestStudiedButton();
+}
+
+function syncActiveTestStudiedButton() {
+  if (!currentTest) return;
+  const isStudied = studiedDocs.has(currentTest.id);
+
+  // Test view button
+  const testBtn = document.getElementById('test-btn-toggle-studied');
+  if (testBtn) {
+    testBtn.className = `btn-toggle-studied ${isStudied ? 'studied' : 'unstudied'}`;
+    const icon = testBtn.querySelector('.icon');
+    const label = testBtn.querySelector('.label');
+    if (icon) icon.textContent = isStudied ? '✓' : '○';
+    if (label) label.textContent = isStudied ? 'Studied' : 'Mark as Studied';
+  }
+
+  // Results view button
+  const resBtn = document.getElementById('res-btn-toggle-studied');
+  if (resBtn) {
+    if (isStudied) {
+      resBtn.className = 'btn-secondary';
+      resBtn.innerHTML = '✓ Studied (Click to unmark)';
+      resBtn.style.color = '#059669';
+      resBtn.style.borderColor = '#a7f3d0';
+      resBtn.style.background = '#ecfdf5';
+    } else {
+      resBtn.className = 'btn-secondary';
+      resBtn.innerHTML = '✨ Mark Document as Studied';
+      resBtn.style.color = '#be185d';
+      resBtn.style.borderColor = '#fbcfe8';
+      resBtn.style.background = '#ffffff';
+    }
+  }
+}
+
+// Sleek Toast Notification
+function showToast(message, isSuccess = true) {
+  const existing = document.querySelector('.studied-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'studied-toast';
+  toast.innerHTML = `<span>${message}</span>`;
+  if (!isSuccess) {
+    toast.style.borderColor = '#fbcfe8';
+    toast.style.color = '#be185d';
+  }
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 3000);
+}
+
 // Filter Bar Handler
 function setupFilterBar() {
   const filterBar = document.getElementById('filter-bar');
   if (!filterBar) return;
 
   filterBar.addEventListener('click', (e) => {
-    if (e.target.classList.contains('filter-btn')) {
-      filterBar.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      e.target.classList.add('active');
-      activeTopicFilter = e.target.dataset.filter || 'all';
+    const btn = e.target.closest('.filter-btn');
+    if (btn) {
+      filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTopicFilter = btn.dataset.filter || 'all';
       renderHub();
     }
   });
@@ -107,6 +294,7 @@ function startTest(testId) {
   document.getElementById('test-active-desc').textContent = test.description;
   document.getElementById('test-badge-count').textContent = `${test.questions.length} Questions`;
 
+  syncActiveTestStudiedButton();
   renderQuestions(test.questions);
   updateProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -325,6 +513,7 @@ function displayResults(correct, total, results) {
     comment.textContent = 'Review the detailed grammar explanations below and try retaking the test!';
   }
 
+  syncActiveTestStudiedButton();
   currentReviewFilter = 'all';
   updateReviewFilterButtons();
   renderReviewList();
@@ -412,6 +601,8 @@ function returnToHub() {
   document.getElementById('test-view').style.display = 'none';
   document.getElementById('results-view').style.display = 'none';
   document.getElementById('hub-view').style.display = 'block';
+  updateStatsRibbon();
+  renderHub();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
